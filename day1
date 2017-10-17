@@ -1,0 +1,22 @@
+mkdir -p /home/hadoop/20171018/student1
+echo 'Hello student1'> ~/$(date +%Y%m%d)/student1/student1.txt
+
+#cat ~/20171017/student1/student1.txt
+
+hadoop fs -mkdir -p /20171018/student1
+hadoop fs -put ~/$(date +%Y%m%d)/student1/student1.txt  /20171018/student1
+hadoop fs -get /20171018/student1/student1.txt ~/20171018/student1/output
+
+
+hadoop fsck /20171018/student1/student1.txt
+
+hadoop fs  -stat  "%o %r" /20171018/student1/student1.txt
+
+hadoop archive -archiveName student1.har -p /20171018/student1 /20171018/student1/output
+
+
+
+hadoop jar /home/hadoop/bigdata/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar  wordcount  /20171018/student1/student1.txt /20171018/student1/output2
+
+
+hadoop fs -ls /20171018/student1/output2
