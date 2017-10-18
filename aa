@@ -1,0 +1,53 @@
+
+use demodb;
+--ODL layer table：
+drop table if exists  d01_s_stud_info;
+create table  d01_s_stud_info as
+select
+concat(college_code ,stud_code) as stud_id,
+stud_code   ,               
+stud_name   ,               
+stud_sex    ,               
+birthday    ,               
+log_date    ,               
+orig_addr   ,               
+lev_date    ,               
+college_code,               
+college_name,               
+state
+from demodb.d01_stud_info_sqoo;
+
+select * from d01_s_stud_info;
+--IDL层 数仓-维度层表
+create table demodb.d01_dim_address_info (id int,city string,people_m double,gdp double,per_gdp double,per_gdp_f double) row format delimited fields terminated by ',' stored as textfile;
+load data local inpath '/home/hadoop/data/stg_city.csv' into table demodb.d01_dim_address_info;
+
+create table d01_dim_address_stg as select distinct orig_addr from d01_stud_info_sqoo;
+drop table if exists  d01_dim_address;
+create table d01_dim_address as select a.orig_addr,b. id,b.people_m,b.gdp,b.per_gdp from d01_dim_address_stg a left outer join d01_dim_address_info b on b.city=a.orig_addr
+
+IDL层 数仓事实表
+create table  d01_dw_stud_info as select 
+a.stud_id,a.stud_code,             
+a.stud_name ,         
+a.stud_sex ,               
+a.birthday,               
+a.log_date    ,               
+a.orig_addr   ,               
+a.lev_date    ,               
+a.college_code,a.college_name,a.state,b.id,b.people_m,b.gdp,b.per_gdp from d01_s_stud_info a left outer join d01_dim_address b on a.orig_addr=b.orig_addr;
+
+ADL层
+Create table d01_dm_stud_info (
+Stud_id string,
+Name string,
+City string,
+City_desc string,
+Birthday string,
+Star string,
+Star_desc string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE;
+
+drop table if exists d01_rpt_college_code_sum;
+Create table d01_rpt_college_code_sum as select college_code,college_name,count(1) from d01_dw_stud_info group by college_code, college_name;
+
