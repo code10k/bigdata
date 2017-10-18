@@ -1,0 +1,33 @@
+use demodb;
+CREATE TABLE d01_stud_info (
+  stud_code string ,
+  stud_name string ,
+  stud_sex string COMMENT '性别',
+  birthday date ,
+  log_date date ,
+  orig_addr string ,
+  lev_date date ,
+  college_code string  COMMENT '学院编码',
+  college_name string ,
+  state string 
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE;
+
+
+#create hdfs directory
+hadoop fs -mkdir -p /20171018/d01/stud_info_dir
+
+drop table if exists d01_external_stud_info;
+create external table d01_external_stud_info (
+stud_code string ,
+  stud_name string ,
+  stud_sex string COMMENT '性别',
+  birthday date ,
+  log_date date ,
+  orig_addr string ,
+  lev_date date ,
+  college_code string  COMMENT '学院编码',
+  college_name string ,
+  state string 
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE
+LOCATION '/20171018/d01/stud_info_dir';
