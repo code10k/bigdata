@@ -1,0 +1,8 @@
+sqoop create-hive-table --connect jdbc:mysql://slave02:3306/testdb --table stud_info --username hive --password hive --hive-table demodb.d01_stud_info_sqoo
+
+sqoop import  --connect jdbc:mysql://slave02:3306/testdb --table stud_info --username hive --password hive --hive-import --hive-table demodb.d01_stud_info_sqoo -m 1 --target-dir temp_levin_db
+
+
+#select in hive
+use demodb;
+select * from d01_stud_info_sqoo ;
